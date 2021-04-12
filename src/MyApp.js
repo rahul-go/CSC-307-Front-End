@@ -6,13 +6,6 @@ import Table from './Table';
 function MyApp() {
   const [characters, setCharacters] = useState([]);
 
-  function removeOneCharacter(index) {
-    const updated = characters.filter((character, i) => {
-      return i !== index
-    });
-    setCharacters(updated);
-  }
-
   async function fetchAll() {
     try {
       const response = await axios.get('http://localhost:5000/users');
@@ -49,6 +42,29 @@ function MyApp() {
       if (result.status === 201)
         setCharacters([...characters, result.data.user]);
     });
+  }
+
+  async function makeDeleteCall(person) {
+    try {
+      const response = await axios.delete('http://localhost:5000/users/' + person.id);
+      return response;
+    }
+    catch (error) {
+      // We're not handling errors. Just logging into the console.
+      console.log(error); 
+      return false;         
+    }
+  }
+
+  function removeOneCharacter(index) {
+    makeDeleteCall(characters[index]).then(result => {
+      if (result.status === 204) {
+        const updated = characters.filter((character, i) => {
+          return i !== index
+        });
+        setCharacters(updated);
+      }
+    })
   }
 
   return (
